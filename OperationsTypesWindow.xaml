@@ -1,0 +1,24 @@
+﻿<Window x:Class="NotationTB.OperationsTypesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NotationTB"
+        mc:Ignorable="d"
+        Title="OperationsTypesWindow" Height="450" Width="800" Closing="Window_Closing">
+    <Grid>
+        <Menu VerticalAlignment="Top" Height="17">
+            <MenuItem Header="Обновить" Click="updateMenuItem_Click"/>
+            <MenuItem Header="Сохранить" Click="saveMenuItem_Click"/>
+            <MenuItem Header="Удалить" Click="delMenuItem_Click"/>
+        </Menu>
+        <DataGrid CanUserDeleteRows="False" AutoGenerateColumns="False" x:Name="operationsTypesGrid" Margin="0,18,0,0">
+            <DataGrid.Columns>
+                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Id}" Header="Индификатор" Width="100"/>
+                <DataGridTextColumn Binding="{Binding Key}" Header="Ключ" Width="100"/>
+                <DataGridTextColumn Binding="{Binding Name}" Header="Название" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+    </Grid>
+</Window>

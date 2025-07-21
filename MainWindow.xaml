@@ -1,0 +1,89 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NotationTB"
+        xmlns:UserControl="clr-namespace:NotationTB.UserControl" x:Class="NotationTB.MainWindow"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="1200">
+    <Grid>
+        <Menu x:Name="Menu" Height="18" VerticalAlignment="Top">
+            <MenuItem x:Name="FileMenuItem" Header="Файл" Height="18"/>
+            <MenuItem x:Name="DBMenuItem" Header="Работа с БД" Height="18">
+                <MenuItem x:Name="OperationsTypesMenuItem" Header="Типы операций" Click="OperationsTypesMenuItem_Click"/>
+                
+            </MenuItem>
+            <MenuItem x:Name="helpMenuItem" Header="Справка" Height="18"/>
+            <MenuItem x:Name="Test" Header="test" Height="18" Click="Test_Click"/>
+        </Menu>
+        <Grid x:Name="NotationCreateGrid"  Margin="0,18,0,0">
+
+
+            <Grid Background="{DynamicResource {x:Static SystemColors.InactiveCaptionBrushKey}}">
+                <TabControl>
+                    <TabItem Header="Создание ТБ" Background="{DynamicResource {x:Static SystemColors.GradientActiveCaptionBrushKey}}">
+                        <Grid>
+                            <Grid Background="{DynamicResource {x:Static SystemColors.GradientActiveCaptionBrushKey}}" Height="75" VerticalAlignment="Top">
+                                <Button x:Name="AddDetailButton" Content="Добавить деталь" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Width="180" Background="{x:Null}" Margin="10,52,0,0" Click="AddDetailButton_Click"/>
+                                <Button Content="Добавить крепёж" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Width="180" Margin="196,52,0,0" Background="{x:Null}"/>
+                                <Button Content="Удалить выбранные элеметы" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Width="180" Margin="383,52,0,0" Background="{x:Null}"/>
+                                <Label Content="Обозначение ТБ" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
+                                <Label Content="Тип трубопроводной арматуры" HorizontalAlignment="Left" Margin="10,22,0,0" VerticalAlignment="Top"/>
+                                <Label Content="Классификационное обозначение" HorizontalAlignment="Left" Margin="357,25,0,0" VerticalAlignment="Top"/>
+                                <ComboBox x:Name="ClassificationDesignationsComboBox" HorizontalAlignment="Left" Margin="561,25,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ClassificationDesignationsComboBox_SelectionChanged"/>
+                                <CheckBox Content="Рабочая температура(до 100/более 100)" HorizontalAlignment="Left" Margin="357,5,0,0" VerticalAlignment="Top"/>
+                                <TextBox HorizontalAlignment="Left" Margin="116,5,0,0" TextWrapping="Wrap" Text="test" VerticalAlignment="Top" Width="236"/>
+                            </Grid>
+                            <Grid Margin="0,75,0,0">
+                                <Grid x:Name="HeaderGrid"  Background="#FFDAD7D7" Margin="0,0,0,0" VerticalAlignment="Top" Height="27">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+
+                                    </Grid.ColumnDefinitions>
+                                    <Label x:Name="NameHeaderLabel" Grid.Column="0" Content="Наименование детали"  SizeChanged="UpdateSizeNotationTable"/>
+                                    <GridSplitter Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+                                    <Label x:Name="PlanNameHeaderLabel" Grid.Column="2" Content="Обозначение по чертежу"  SizeChanged="UpdateSizeNotationTable"/>
+                                    <GridSplitter Grid.Column="3" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+                                    <Label x:Name="MaterialStampHeaderLabel" Grid.Column="4" Content="Марка стали"  SizeChanged="UpdateSizeNotationTable"/>
+                                    <GridSplitter Grid.Column="5" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+                                    <Label x:Name="MaterialStandartHeaderLabel" Grid.Column="6" Content="Стандарт или ТУ"  SizeChanged="UpdateSizeNotationTable"/>
+                                    <GridSplitter Grid.Column="7" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+                                    <Label x:Name="ProductStandartHeaderLabel" Grid.Column="8" Content="ТУ на полуфабрикат"  SizeChanged="UpdateSizeNotationTable"/>
+                                    <GridSplitter Grid.Column="9" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+                                    <Label x:Name="OtherRuleHeaderLabel" Grid.Column="10" Content="Доп. условия"  SizeChanged="UpdateSizeNotationTable"/>
+
+
+                                </Grid>
+                                <Grid Margin="0,27,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="69*"/>
+                                        <ColumnDefinition Width="331*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel x:Name="detailsStackPanel" Grid.ColumnSpan="2">
+
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="Предпросмотр ТБ" Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" IsEnabled="False">
+                        <Grid Background="{DynamicResource {x:Static SystemColors.GradientActiveCaptionBrushKey}}"/>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+
+        </Grid>
+    </Grid>
+
+</Window>

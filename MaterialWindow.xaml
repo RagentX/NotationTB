@@ -1,0 +1,27 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NotationTB"
+        xmlns:UserControl="clr-namespace:NotationTB.UserControl" x:Class="NotationTB.MaterialWindow"
+        mc:Ignorable="d"
+        Title="MaterialWindow" Height="450" Width="800">
+    <Grid>
+        <Label Content="Название материала" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Label Content="Тип матерала" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="39,26,0,0"/>
+        <TabControl x:Name="ProductsStandardsTabControl" Margin="0,100                     ,0,0">
+            
+        </TabControl>
+        <Label Content="Стандарт" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="64,52,0,0"/>
+        <TextBox HorizontalAlignment="Left" Margin="124,4,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="144"/>
+        <ComboBox HorizontalAlignment="Left" Margin="124,28,0,0" VerticalAlignment="Top" Width="144" IsEditable="True"/>
+        <ComboBox HorizontalAlignment="Left" Margin="124,54,0,0" VerticalAlignment="Top" Width="144" IsEditable="True"/>
+        <Button Content="Добавить новый тип" HorizontalAlignment="Left" Margin="273,29,0,0" VerticalAlignment="Top" Width="150"/>
+        <Button Content="Добавить новый стандарт" HorizontalAlignment="Left" Margin="273,55,0,0" VerticalAlignment="Top" Width="150"/>
+        <Label Content="- неиспользуемыемы типы полуфабриката" HorizontalAlignment="Left" Margin="47,76,0,0" VerticalAlignment="Top"/>
+        <Rectangle HorizontalAlignment="Left" Height="15" Margin="5,83,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" Fill="#FFBDBDBD"/>
+        <Label Content="Такое название уже есть в БД" HorizontalAlignment="Left" Margin="268,0,0,0" VerticalAlignment="Top" Width="177" Foreground="Red"/>
+
+    </Grid>
+</Window>
