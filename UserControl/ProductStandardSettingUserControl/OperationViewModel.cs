@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NotationTB.UserControl.ProductStandardsSettingUserControl
+namespace NotationTB.UserControl.ProductStandardSettingUserControl
 {
     class OperationViewModel
     {

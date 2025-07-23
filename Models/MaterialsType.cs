@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace NotationTB.Models;
 
@@ -13,6 +14,8 @@ public partial class MaterialsType
     public string Name { get; set; } = null!;
 
     public bool IsAustenit { get; set; }
+
+    public override string ToString() => $"{Id}:{Name}";
 
     public virtual ICollection<BasesRulesOperation> BasesRulesOperations { get; set; } = new List<BasesRulesOperation>();
 

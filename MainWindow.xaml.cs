@@ -28,6 +28,10 @@ namespace NotationTB
     {
         private int userID;
         private DbSet<ClassificationDesignation> classDesignations;
+
+        public event Action<double, double, double, double, double, double> OnUpdateSize;
+        public event Action<int> OnUpdateClassificationDesignation;
+
         /// <summary>
         /// Главное окно приложения
         /// </summary>
@@ -47,8 +51,7 @@ namespace NotationTB
             
         }
 
-        public event Action<double, double, double, double, double, double> OnUpdateSize;
-        public event Action<int> OnUpdateClassificationDesignation;
+        
 
         private void UpdateSizeNotationTable(object sender, SizeChangedEventArgs e)
         {

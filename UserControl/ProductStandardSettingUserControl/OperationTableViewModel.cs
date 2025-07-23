@@ -11,7 +11,7 @@ using System.Windows.Input;
 using NotationTB.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace NotationTB.UserControl.ProductStandardsSettingUserControl
+namespace NotationTB.UserControl.ProductStandardSettingUserControl
 {
     class OperationTableViewModel : INotifyPropertyChanged
     {

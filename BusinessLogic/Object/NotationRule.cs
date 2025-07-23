@@ -1,65 +1,113 @@
-﻿using System.Windows.Automation;
-using NotationTB.Data;
-using NotationTB.Models;
+﻿using NotationTB.Data;
 
 namespace NotationTB.BusinessLogic.Object;
 
-internal class NotationRule
+public class NotationRule
 {
-    private int designationId;
-    private int materialsStampId;
-    private int materialsStandardId;
-    private int productsStandardId;
-    private readonly Dictionary<int, bool> rules;
+    private int combinationId = -1;
+    private readonly int materialTypeId;
 
-    private NotationRule(int materialsStampId, int materialsStandardId, int productsStandardId, int designationId,
-        Dictionary<int, bool> rules)
+    public List<OperationRow> OperationRows = new();
+    private readonly int productTypeId;
+
+    public NotationRule(int materialTypeId, int productTypeId)
     {
-        this.materialsStampId = materialsStampId;
-        this.materialsStandardId = materialsStandardId;
-        this.productsStandardId = productsStandardId;
-        this.designationId = designationId;
-        this.rules = rules;
-    }
-    /// <summary>
-    /// Создание списка правил для материала с описаными критериями 
-    /// </summary>
-    /// <param name="materialsStampId"></param>
-    /// <param name="materialsStandardId"></param>
-    /// <param name="productsStandardId"></param>
-    /// <param name="designationId"></param>
-    private NotationRule(int materialsStampId, int materialsStandardId, int productsStandardId, int designationId)
-    {
+        OperationRows.Clear();
+        this.materialTypeId = materialTypeId;
+        this.productTypeId = productTypeId;
         using (var db = new AppDbContext())
         {
-            //var rulesOperations = db.ExceptionRulesOperations.Where(r =>
-            //(
-            //    r.MatStandardId == materialsStampId &&
-            //    r.ProStandardId == materialsStandardId &&
-            //    r.ProStandardId == productsStandardId &&
-            //    r.DesignationId == designationId
-            //)).ToList();
-            //foreach (var rule in rulesOperations)
-            //{
-            //    rules = new Dictionary<int, bool>();
-            //    rules.Add(rule.OperationTypeId.Value,rule.Value);
-            //}
+            var i = 0;
+            var classifications = db.ClassificationDesignations.OrderBy(c => c.Id).ToList();
+            foreach (var classification in classifications)
+            {
+                OperationRows.Add(new OperationRow(classification.Id));
+                var baseRules = db.BasesRulesOperations.Where(b =>
+                    b.ProductTypeId == productTypeId &&
+                    b.MaterialTypeId == materialTypeId &&
+                    b.DesignationId == classification.Id);
+                foreach (var baseRule in baseRules) OperationRows[i].Values[baseRule.OperationTypeId] = baseRule.Value;
+
+                i++;
+            }
         }
     }
-    /// <summary>
-    /// Добавления правила
-    /// </summary>
-    /// <param name="id">Код типа операции из БД</param>
-    /// <param name="value">Значение</param>
-    /// <exception cref="Exception"></exception>
-    public void AddRule(int id, bool value)
+
+    public NotationRule(int combinationId)
     {
+        this.combinationId = combinationId;
+        OperationRows.Clear();
         using (var db = new AppDbContext())
         {
-            if (db.OperationsTypes.Where(o => o.Id == id).Any())
-                rules.Add(id, value);
-            else
-                throw new Exception("Такого кода типа операции нет в БД");
+            var combination = db.MaterialsAndProductsCombinations.Where(c => c.Id == combinationId).First();
+
+            var materialStampId = combination.MaterialId;
+            var productStandardId = combination.ProStandardId;
+
+            materialTypeId = db.MaterialsStamps.Where(m => m.Id == materialStampId).Select(m => m.TypeId).First();
+            productTypeId = db.ProductsStandards.Where(p => p.Id == productStandardId).Select(p => p.TypeId).First();
+            var i = 0;
+            var classifications = db.ClassificationDesignations;
+
+
+            foreach (var classification in classifications)
+            {
+                OperationRows.Add(new OperationRow(classification.Id));
+                var baseRules = db.BasesRulesOperations.Where(b =>
+                    b.ProductTypeId == productTypeId &&
+                    b.MaterialTypeId == materialTypeId &&
+                    b.DesignationId == classification.Id);
+                foreach (var baseRule in baseRules) OperationRows[i].Values[baseRule.OperationTypeId] = baseRule.Value;
+
+                var exceptionRules = db.ExceptionRulesOperations.Where(e =>
+                    e.CombinationId == combinationId);
+                foreach (var exceptionRule in exceptionRules)
+                    OperationRows[i].Values[exceptionRule.OperationTypeId] = exceptionRule.Value;
+            }
         }
+    }
+
+    public void Save(int combinationId)
+    {
+        this.combinationId = combinationId;
+        using (var db = new AppDbContext())
+        {
+            var i = 0;
+            var classifications = db.ClassificationDesignations.OrderBy(c => c.Id).ToList();
+            foreach (var classification in classifications)
+            {
+                var baseRules = db.BasesRulesOperations.Where(b =>
+                    b.ProductTypeId == productTypeId &&
+                    b.MaterialTypeId == materialTypeId &&
+                    b.DesignationId == classification.Id);
+                foreach (var baseRule in baseRules)
+                    if (OperationRows[i].Values[baseRule.OperationTypeId] == baseRule.Value &&
+                        db.ExceptionRulesOperations.Where(e =>
+                            e.CombinationId == combinationId &&
+                            e.DesignationId == classification.Id &&
+                            e.OperationTypeId == baseRule.OperationTypeId).Any() == false)
+                    {
+                        OperationRows[i].Values.Remove(baseRule.OperationTypeId);
+                    }
+
+                i++;
+            }
+
+            foreach (var OperationRow in OperationRows)
+            {
+                foreach (var values in OperationRow.Values)
+                {
+                    ExceptionRulesOperationBL.AddOrReplase( combinationId, OperationRow.ClassificationId, values.Key, values.Value);
+                }
+            }
+        }
+    }
+
+    public void Save()
+    {
+        if (combinationId == -1)
+            throw new ArgumentException("Не заполнен код комбинации, используйте сохранение с кобом комбинации",
+                nameof(combinationId));
+        Save(combinationId);
     }
 }

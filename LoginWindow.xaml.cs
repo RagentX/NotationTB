@@ -32,6 +32,11 @@ public partial class LoginWindow : Window
     /// <param name="e"></param>
     private void LoginButton_Click(object sender, RoutedEventArgs e)
     {
+        var mainWindow = new MainWindow(0);
+        mainWindow.Show();
+        Close();
+
+
         var login = LoginTextBox.Text;
         var password = PasswordBox.Password;
         string message;
@@ -40,7 +45,7 @@ public partial class LoginWindow : Window
         {
             if (userLogic.Authorization(login, password, out id, out message))
             {
-                var mainWindow = new MainWindow(id);
+                mainWindow = new MainWindow(id);
                 mainWindow.Show();
                 Close();
             }
