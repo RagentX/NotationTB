@@ -12,7 +12,7 @@ public partial class MaterialsStandard
 
     public string Name { get; set; } = null!;
 
-    public override string ToString() => $"{Id}:{Name}";
+    public override string ToString() => $"{Name}";
 
     public virtual ICollection<MaterialsAndProductsCombination> MaterialsAndProductsCombinations { get; set; } = new List<MaterialsAndProductsCombination>();
 }

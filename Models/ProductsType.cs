@@ -12,6 +12,7 @@ public partial class ProductsType
 
     public string Name { get; set; } = null!;
 
+    public override string ToString() => $"{Id}:{Name}";
     public virtual ICollection<BasesRulesOperation> BasesRulesOperations { get; set; } = new List<BasesRulesOperation>();
 
     public virtual ICollection<ProductsStandard> ProductsStandards { get; set; } = new List<ProductsStandard>();

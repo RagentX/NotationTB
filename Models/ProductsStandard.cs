@@ -14,7 +14,7 @@ public partial class ProductsStandard
 
     public int TypeId { get; set; }
 
-    public override string ToString() => $"{Id}:{Name}";
+    public override string ToString() => $"{Name}";
 
     public virtual ICollection<MaterialsAndProductsCombination> MaterialsAndProductsCombinations { get; set; } = new List<MaterialsAndProductsCombination>();
 

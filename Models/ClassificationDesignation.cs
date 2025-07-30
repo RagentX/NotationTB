@@ -11,6 +11,7 @@ public partial class ClassificationDesignation
     public int Id { get; set; }
 
     public string Name { get; set; } = null!;
+    public override string ToString() => $"{Name}";
 
     public virtual ICollection<BasesRulesOperation> BasesRulesOperations { get; set; } = new List<BasesRulesOperation>();
 

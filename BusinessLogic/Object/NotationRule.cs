@@ -9,7 +9,11 @@ public class NotationRule
 
     public List<OperationRow> OperationRows = new();
     private readonly int productTypeId;
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="materialTypeId"></param>
+    /// <param name="productTypeId"></param>
     public NotationRule(int materialTypeId, int productTypeId)
     {
         OperationRows.Clear();
@@ -25,14 +29,17 @@ public class NotationRule
                 var baseRules = db.BasesRulesOperations.Where(b =>
                     b.ProductTypeId == productTypeId &&
                     b.MaterialTypeId == materialTypeId &&
-                    b.DesignationId == classification.Id);
+                    b.DesignationId == classification.Id).ToList();
                 foreach (var baseRule in baseRules) OperationRows[i].Values[baseRule.OperationTypeId] = baseRule.Value;
 
                 i++;
             }
         }
     }
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="combinationId"></param>
     public NotationRule(int combinationId)
     {
         this.combinationId = combinationId;
@@ -66,7 +73,7 @@ public class NotationRule
             }
         }
     }
-
+    
     public void Save(int combinationId)
     {
         this.combinationId = combinationId;
@@ -102,7 +109,10 @@ public class NotationRule
             }
         }
     }
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <exception cref="ArgumentException"></exception>
     public void Save()
     {
         if (combinationId == -1)

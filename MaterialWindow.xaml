@@ -6,22 +6,18 @@
         xmlns:local="clr-namespace:NotationTB"
         xmlns:UserControl="clr-namespace:NotationTB.UserControl" x:Class="NotationTB.MaterialWindow"
         mc:Ignorable="d"
-        Title="MaterialWindow" Height="450" Width="800" Loaded="Window_Loaded">
+        Title="MaterialWindow" Height="600" Width="1000">
     <Grid>
         <Label Content="Название материала" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <Label Content="Тип матерала" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="39,26,0,0"/>
-        <TabControl x:Name="ProductsStandardsTabControl" Margin="0,100                     ,0,0">
-            
-        </TabControl>
-        <Label Content="Стандарт" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="64,52,0,0"/>
         <TextBox HorizontalAlignment="Left" Margin="124,4,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="144"/>
         <ComboBox x:Name="MaterialTypeComboBox" HorizontalAlignment="Left" Margin="124,28,0,0" VerticalAlignment="Top" Width="144" IsDropDownOpen="True" SelectionChanged="MaterialTypeComboBox_SelectionChanged"/>
-        <ComboBox x:Name="MaterialStandardComboBox" HorizontalAlignment="Left" Margin="124,54,0,0" VerticalAlignment="Top" Width="144" IsEditable="True"/>
         <Button Content="Добавить новый тип" HorizontalAlignment="Left" Margin="273,29,0,0" VerticalAlignment="Top" Width="150"/>
-        <Button Content="Добавить новый стандарт" HorizontalAlignment="Left" Margin="273,55,0,0" VerticalAlignment="Top" Width="150"/>
-        <Label Content="- неиспользуемыемы типы полуфабриката" HorizontalAlignment="Left" Margin="47,76,0,0" VerticalAlignment="Top"/>
-        <Rectangle HorizontalAlignment="Left" Height="15" Margin="5,83,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" Fill="#FFBDBDBD"/>
+        <Button x:Name="AddStandardButton" Content="Добавить новый стандарт" HorizontalAlignment="Left" Margin="10,57,0,0" VerticalAlignment="Top" Width="150" Click="AddStandardButton_Click"/>
         <Label Content="Такое название уже есть в БД" HorizontalAlignment="Left" Margin="268,0,0,0" VerticalAlignment="Top" Width="177" Foreground="Red"/>
+        <TabControl x:Name="ProductsStandardsTabControl" Margin="0,82,0,27">
 
+        </TabControl>
+        <Button x:Name="SaveButton" Content="Сохранить" HorizontalAlignment="Left" Margin="10,0,0,5" VerticalAlignment="Bottom" Click="SaveButton_Click"/>
     </Grid>
 </Window>

@@ -21,15 +21,15 @@
             <ColumnDefinition Width="*" />
 
         </Grid.ColumnDefinitions>
-        <ComboBox x:Name="NameComboBox" Grid.Column="0" IsEditable="True"  />
+        <TextBox x:Name="NameTextBox" Grid.Column="0"/>
         <GridSplitter Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" IsEnabled="False"/>
-        <ComboBox x:Name="PlanNameComboBox" Grid.Column="2" IsEditable="True"  />
+        <TextBox x:Name="PlanNameTextBox" Grid.Column="2"/>
         <GridSplitter Grid.Column="3" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" IsEnabled="False"/>
-        <ComboBox x:Name="MaterialStampComboBox" Grid.Column="4" IsEditable="True" />
+        <ComboBox x:Name="MaterialStampComboBox" Grid.Column="4" IsEditable="True" SelectionChanged="MaterialStampComboBox_SelectionChanged" />
         <GridSplitter Grid.Column="5" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" IsEnabled="False"/>
-        <ComboBox x:Name="MaterialStandartComboBox" Grid.Column="6" IsEditable="True" />
+        <ComboBox x:Name="MaterialStandardComboBox" Grid.Column="6" IsEditable="True" SelectionChanged="MaterialStandardComboBox_SelectionChanged" />
         <GridSplitter Grid.Column="7" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" IsEnabled="False"/>
-        <ComboBox x:Name="ProductStandartComboBox" Grid.Column="8" IsEditable="True" />
+        <ComboBox x:Name="ProductStandardComboBox" Grid.Column="8" IsEditable="True" SelectionChanged="ProductStandardComboBox_SelectionChanged" />
         <GridSplitter Grid.Column="9" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" IsEnabled="False"/>
         <Grid x:Name="OtherRuleGrid" Grid.Column="10" Background="White" >
             <Menu VerticalAlignment="Center">

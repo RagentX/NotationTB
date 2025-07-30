@@ -12,7 +12,7 @@ public partial class OperationsType
 
     public string Name { get; set; } = null!;
 
-    public override string ToString() => $"{Id}:{Name}";
+    public override string ToString() => $"{Name}";
 
     public virtual ICollection<BasesRulesOperation> BasesRulesOperations { get; set; } = new List<BasesRulesOperation>();
 

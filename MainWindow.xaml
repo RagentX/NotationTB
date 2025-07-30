@@ -21,7 +21,7 @@
 
 
             <Grid Background="{DynamicResource {x:Static SystemColors.InactiveCaptionBrushKey}}">
-                <TabControl>
+                <TabControl x:Name="MainTabControl" SelectionChanged="MainTabControl_SelectionChanged">
                     <TabItem Header="Создание ТБ" Background="{DynamicResource {x:Static SystemColors.GradientActiveCaptionBrushKey}}">
                         <Grid>
                             <Grid Background="{DynamicResource {x:Static SystemColors.GradientActiveCaptionBrushKey}}" Height="75" VerticalAlignment="Top">
@@ -49,7 +49,6 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
-
                                     </Grid.ColumnDefinitions>
                                     <Label x:Name="NameHeaderLabel" Grid.Column="0" Content="Наименование детали"  SizeChanged="UpdateSizeNotationTable"/>
                                     <GridSplitter Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
@@ -77,12 +76,14 @@
                             </Grid>
                         </Grid>
                     </TabItem>
-                    <TabItem Header="Предпросмотр ТБ" Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" IsEnabled="False">
-                        <Grid Background="{DynamicResource {x:Static SystemColors.GradientActiveCaptionBrushKey}}"/>
+                    <TabItem x:Name="PreviewTabItem" Header="Предпросмотр ТБ" Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}">
+                        <Grid Background="{DynamicResource {x:Static SystemColors.GradientActiveCaptionBrushKey}}">
+                            <DataGrid x:Name="PreviewDataGrid" AutoGenerateColumns="False" Margin="0,30,0,0" IsReadOnly="True"/>
+                            <Button Content="Обновить" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top"/>
+                        </Grid>
                     </TabItem>
                 </TabControl>
             </Grid>
-
         </Grid>
     </Grid>
 

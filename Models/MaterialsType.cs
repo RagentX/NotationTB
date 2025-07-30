@@ -15,7 +15,7 @@ public partial class MaterialsType
 
     public bool IsAustenit { get; set; }
 
-    public override string ToString() => $"{Id}:{Name}";
+    public override string ToString() => $"{Name}";
 
     public virtual ICollection<BasesRulesOperation> BasesRulesOperations { get; set; } = new List<BasesRulesOperation>();
 

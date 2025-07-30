@@ -14,5 +14,7 @@ public partial class MaterialsStamp
 
     public int TypeId { get; set; }
 
+    public override string ToString() => $"{Name}";
+
     public virtual MaterialsType Type { get; set; } = null!;
 }

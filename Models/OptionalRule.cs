@@ -19,6 +19,7 @@ public partial class OptionalRule
     public int? DesignationId { get; set; }
 
     public int? MaterialTypeId { get; set; }
+    public override string ToString() => $"{Name}";
 
     public virtual ClassificationDesignation? Designation { get; set; }
 

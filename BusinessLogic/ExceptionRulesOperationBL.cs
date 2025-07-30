@@ -13,7 +13,7 @@ namespace NotationTB.BusinessLogic
     {
         public static void  AddOrReplase(int combinationID, int designationId, int operationTypeID, bool value)
         {
-            //todo: сделать автоматическую првоерку, если условие соответствует стандртному правилу, удалять строку исключения
+            //todo: сделать автоматическую проверку, если условие соответствует стандртному правилу, удалять строку исключения
             using (AppDbContext db = new AppDbContext())
             {
                 if (db.ExceptionRulesOperations

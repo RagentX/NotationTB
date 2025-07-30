@@ -24,14 +24,6 @@ namespace NotationTB
     public partial class MaterialWindow : Window
     {
         private List<TabItem> tabItems = new List<TabItem>();
-        private List<TextBlock> tabItemsHeaderTextBlocks = new List<TextBlock>
-        {
-            new TextBlock {Text = "Листы"},
-            new TextBlock {Text = "Поковки"},
-            new TextBlock {Text = "Крепёжные изделия"},
-            new TextBlock {Text = "Сортовой прокат"},
-            new TextBlock {Text = "Отливки"},
-        };
 
         private MaterialsType materialsType;
 
@@ -58,17 +50,44 @@ namespace NotationTB
         public MaterialWindow()
         {
             InitializeComponent();
-            
-            
+            AfterInitialize();
         }
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void AfterInitialize()
         {
             using (var db = new AppDbContext())
             {
                 MaterialTypeComboBox.ItemsSource = db.MaterialsTypes.ToArray();
-                MaterialStandardComboBox.ItemsSource = db.MaterialsStandards.ToArray();
             }
+
         }
+        public void HeaderUpdate(ProductsType productsType, MaterialsStandard materialsStandard, int id)
+        {
+            if (productsType == null && materialsStandard == null)
+            {
+                tabItems[id].Header = "n/a";
+                tabItems[id].Background = new SolidColorBrush(Colors.Red);
+                return;
+            }
+
+            if (productsType == null)
+            {
+                tabItems[id].Header = $"n/a,{materialsStandard.Name}";
+                tabItems[id].Background = new SolidColorBrush(Colors.Red);
+                return;
+            }
+
+            if (materialsStandard == null)
+            {
+                tabItems[id].Header = $"{productsType.Name}, n/a";
+                tabItems[id].Background = new SolidColorBrush(Colors.Red);
+                return;
+            }
+            tabItems[id].Background = new SolidColorBrush(Colors.Green);
+            tabItems[id].Header = $"{productsType.Name},{materialsStandard.Name}";
+        }
+
+
+        
 
 
         private void MaterialTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -77,28 +96,46 @@ namespace NotationTB
             {
                 tabItems.Clear();
                 ProductsStandardsTabControl.Items.Clear();
-                for (int i = 0; i < 5; i++)
-                {
-                    materialsType = MaterialTypeComboBox.SelectedItem as MaterialsType;
-                    ProductsStandardsUserControl productsStandardsUserControl = new ProductsStandardsUserControl(materialsType.Id, i + 2);
-                    //тут бинды на события
-                    SaveAll += productsStandardsUserControl.SaveAll;
-                    TabItem tabItem = new TabItem
-                    {
-                        Header = tabItemsHeaderTextBlocks[i],
-                        Content = productsStandardsUserControl
-                    };
-                    tabItems.Add(tabItem);
-                    ProductsStandardsTabControl.Items.Add(tabItem);
+                //for (int i = 0; i < 5; i++)
+                //{
+                //    materialsType = MaterialTypeComboBox.SelectedItem as MaterialsType;
+                //    ProductsStandardsUserControl productsStandardsUserControl = new ProductsStandardsUserControl(materialsType.Id, i + 2);
+                //    //тут бинды на события
+                //    SaveAll += productsStandardsUserControl.SaveAll;
+                //    TabItem tabItem = new TabItem
+                //    {
+                //        Header = tabItemsHeaderTextBlocks[i],
+                //        Content = productsStandardsUserControl
+                //    };
+                //    tabItems.Add(tabItem);
+                //    ProductsStandardsTabControl.Items.Add(tabItem);
 
-                }
+                //}
             }
             else
             {
                 MaterialTypeComboBox.SelectedItem = materialsType;
             }
         }
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
 
-        
+        }
+
+        private void AddStandardButton_Click(object sender, RoutedEventArgs e)
+        {
+            materialsType = MaterialTypeComboBox.SelectedItem as MaterialsType;
+            ProductsStandardsUserControl productsStandardsUserControl = new ProductsStandardsUserControl(materialsType, tabItems.Count);
+            //тут бинды на события
+            SaveAll += productsStandardsUserControl.SaveAll;
+            productsStandardsUserControl.HeaderUpdate += HeaderUpdate;
+            TabItem tabItem = new TabItem
+            {
+                Header = "n/a",
+                Content = productsStandardsUserControl
+            };
+            tabItems.Add(tabItem);
+            ProductsStandardsTabControl.Items.Add(tabItem);
+        }
     }
 }

@@ -31,16 +31,22 @@ namespace NotationTB.UserControl
         private List<ProductStandardSettingUserControl.ProductStandardSettingUserControl>
             productStandardSettingUserControls =
                 new List<ProductStandardSettingUserControl.ProductStandardSettingUserControl>();
-        private int materialTypeId = -1, productTypeId = -1, combinationId = -1;
+        private MaterialsType materialType;
+        private MaterialsStandard materialsStandard;
+        private ProductsType productType;
         public event Action Save;
+        public event Action<ProductsType, MaterialsStandard, int> HeaderUpdate;
+        public event Action<int> TabDel;
+        public int Id;
         internal List<ProductsStandard> ProductsStandards = new List<ProductsStandard>();
         internal List<ProductsStandard> AllProductsStandards = new List<ProductsStandard>();
         internal List<ProductsStandard> SelectedProductsStandards = new List<ProductsStandard>();
-        public ProductsStandardsUserControl(int materialTypeId, int productTypeId)
+        public ProductsStandardsUserControl(MaterialsType materialsType, int id)
         {
             InitializeComponent();
-            this.materialTypeId = materialTypeId;
-            this.productTypeId = productTypeId;
+            this.materialType = materialType;
+            this.Id = id;
+            AfterInitialize();
         }
 
         public void UpdateSelectedProductsStandard(ProductsStandard lastProductsStandard, ProductsStandard newProductsStandard, int id)
@@ -52,6 +58,16 @@ namespace NotationTB.UserControl
             SelectedProductsStandards.Add(newProductsStandard);
             UpdateProductsStandards();
             tabItems[id].Header = newProductsStandard.ToString();
+            tabItems[id].Background = new SolidColorBrush(Colors.Green);
+        }
+        private void AfterInitialize()
+        {
+            UpdateProductsStandards();
+            using (AppDbContext db = new AppDbContext())
+            {
+                ProductTypeComboBox.ItemsSource = db.ProductsTypes.ToList();
+                MaterialStandardComboBox.ItemsSource = db.MaterialsStandards.ToList();
+            }
         }
 
         public void SaveAll()
@@ -72,12 +88,25 @@ namespace NotationTB.UserControl
             AddTabItem();
         }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        
+
+        private void MaterialStandardComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            UpdateProductsStandards();
+            if (materialsStandard == null)
+            { 
+                materialsStandard = MaterialStandardComboBox.SelectedItem as MaterialsStandard;
+                HeaderUpdate.Invoke(productType, materialsStandard, Id);
+            }
         }
 
-
+        private void ProductTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (productType == null)
+            {
+                productType = ProductTypeComboBox.SelectedItem as ProductsType;
+                HeaderUpdate.Invoke(productType, materialsStandard, Id);
+            }
+        }
 
         /// <summary>
         /// Добавление новой вкладки с описанием стандарта полуфабриката
@@ -89,28 +118,37 @@ namespace NotationTB.UserControl
 
             tabItem.Header = "n/a";
             ProductStandardSettingUserControl.ProductStandardSettingUserControl product;
-            product = new ProductStandardSettingUserControl.ProductStandardSettingUserControl(materialTypeId, combinationId);
+            product = new ProductStandardSettingUserControl.ProductStandardSettingUserControl(materialType.Id, combinationId);
             Save += product.Save;
             tabItem.Content = product;
 
             tabItems.Add(tabItem);
             StandardTabControl.Items.Add(tabItem);
         }
+
+        
+
         private void AddTabItem()
         {
-            TabItem tabItem = new TabItem();
-            tabItem.Header = "n/a";
-            ProductStandardSettingUserControl.ProductStandardSettingUserControl product;
-            product = new ProductStandardSettingUserControl.ProductStandardSettingUserControl(materialTypeId, productTypeId, productStandardSettingUserControls.Count);
-            Save += product.Save;
-            product.StandardChange += UpdateSelectedProductsStandard;
-            product.ProductStandardComboBox.ItemsSource = ProductsStandards;
+            if (materialType != null && productType != null)
+            {
+                TabItem tabItem = new TabItem();
+                tabItem.Header = "n/a";
+                ProductStandardSettingUserControl.ProductStandardSettingUserControl product;
+                product = new ProductStandardSettingUserControl.ProductStandardSettingUserControl(materialType.Id,
+                    productType.Id, productStandardSettingUserControls.Count);
+                Save += product.Save;
+                product.StandardChange += UpdateSelectedProductsStandard;
+                product.ProductStandardComboBox.ItemsSource = ProductsStandards;
 
-            productStandardSettingUserControls.Add(product);
+                productStandardSettingUserControls.Add(product);
 
-            tabItem.Content = product;
-            tabItems.Add(tabItem);
-            StandardTabControl.Items.Add(tabItem);
+                tabItem.Content = product;
+                tabItems.Add(tabItem);
+                StandardTabControl.Items.Add(tabItem);
+            }
         }
+
+        
     }
 }
