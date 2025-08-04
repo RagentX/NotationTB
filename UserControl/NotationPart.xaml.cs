@@ -30,6 +30,7 @@ namespace NotationTB.UserControl
         private List<MaterialsStandard> materialsStandards;
         private List<ProductsStandard> productsStandards;
         private List<MaterialsAndProductsCombination> materialsAndProductsCombinations;
+        private List<OptionalRule> optionalRules;
 
         private int classificationId;
 
@@ -59,14 +60,14 @@ namespace NotationTB.UserControl
         }
 
        public int MaterialsStampId
-        {
+       {
             get
             {
                 if (MaterialStampComboBox.SelectedIndex >= 0)
                     return (MaterialStampComboBox.SelectedItem as MaterialsStamp).Id;
                 return 0;
             }
-        }
+       }
 
         public int ProductStandardId
         {
@@ -177,15 +178,20 @@ namespace NotationTB.UserControl
         }
         private void MaterialStampComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            using (var db = new AppDbContext())
+            if (MaterialStampComboBox.SelectedIndex >= 0)
             {
-                int materialId = (MaterialStampComboBox.SelectedItem as MaterialsStamp).Id;
-                materialsAndProductsCombinations =
-                    db.MaterialsAndProductsCombinations.Where(m => m.MaterialId == materialId).ToList();
-                UpdateMaterialStandard();
-            }
+                using (var db = new AppDbContext())
+                {
+                    int materialId = (MaterialStampComboBox.SelectedItem as MaterialsStamp).Id;
+                    materialsAndProductsCombinations = new();
+                    materialsAndProductsCombinations =
+                        db.MaterialsAndProductsCombinations.Where(m => m.MaterialId == materialId).ToList();
+                    UpdateMaterialStandard();
+                }
 
-            BindValuesUpdate();
+                UpdateOtherRules();
+                BindValuesUpdate();
+            }
         }
         /// <summary>
         /// Обновление стандартов материала
@@ -201,6 +207,7 @@ namespace NotationTB.UserControl
                 }
 
                 materialsStandards = materialsStandards.Distinct().ToList();
+                MaterialStandardComboBox.Items.Clear();
                 foreach (var materialsStandard in materialsStandards)
                 {
                     MaterialStandardComboBox.Items.Add(materialsStandard);
@@ -235,6 +242,7 @@ namespace NotationTB.UserControl
                     productsStandards.Add(db.ProductsStandards.Where(p => p.Id == materialsAndProductsCombination.ProStandardId).First());
                 }
                 productsStandards = productsStandards.Distinct().ToList();
+                ProductStandardComboBox.Items.Clear();
                 foreach (var productsStandard in productsStandards)
                 {
                     ProductStandardComboBox.Items.Add(productsStandard);
@@ -248,26 +256,46 @@ namespace NotationTB.UserControl
         {
             classificationId = classDesignationId;
             BindValuesUpdate();
-            //test.Items.Clear();
 
-            //using (var db = new NotationTbContext())
-            //{
-            //    otherRules = db.OtherRules.Where(o => o.DesignationId == classDesignationId && o.ForAll == false);
+            using (var db = new AppDbContext())
+            {
+                optionalRules = db.OptionalRules.Where(o =>
+                    (o.DesignationId == classificationId || o.DesignationId == null) && 
+                    o.ForAll == false && 
+                    o.MaterialTypeId == null).ToList();
+                OptionalRulesMenu.Items.Clear();
+                foreach (var optionalRule in optionalRules)
+                {
+                    CheckBox checkBox = new CheckBox();
+                    checkBox.Content = optionalRule.ToString();
+                    checkBox.Checked += UpdateCheckBoxHeader;
+                    checkBox.Unchecked += UpdateCheckBoxHeader;
+                    checkBoxes.Add(checkBox);
+                    OptionalRulesMenu.Items.Add(checkBox);
+                }
+            }
 
-            //    foreach (var otherRule in otherRules)
-            //    {
-            //        CheckBox checkBox = new CheckBox();
-            //        checkBox.Content = otherRule.Name == null ? "" : otherRule.Name;
-            //        checkBox.Checked += UpdateCheckBoxHeader;
-            //        checkBox.Unchecked += UpdateCheckBoxHeader;
-            //        checkBoxes.Add(checkBox);
-            //        test.Items.Add(checkBox);
-            //    }
-            //}
-            //using (var db = new NotationTbContext())
-            //{
-            //    test.Items.Add(new CheckBox());
-            //}
+        }
+        public void UpdateOtherRules()
+        {
+            using (var db = new AppDbContext())
+            {
+                optionalRules = db.OptionalRules.Where(o =>
+                    (o.DesignationId == classificationId || o.DesignationId == null) &&
+                    o.ForAll == false &&
+                    (o.MaterialTypeId == (MaterialStampComboBox.SelectedItem as MaterialsStamp).TypeId || o.MaterialTypeId == null)).ToList();
+                OptionalRulesMenu.Items.Clear();
+                foreach (var optionalRule in optionalRules)
+                {
+                    CheckBox checkBox = new CheckBox();
+                    checkBox.Content = optionalRule.ToString();
+                    checkBox.Checked += UpdateCheckBoxHeader;
+                    checkBox.Unchecked += UpdateCheckBoxHeader;
+                    checkBoxes.Add(checkBox);
+                    OptionalRulesMenu.Items.Add(checkBox);
+                }
+            }
+
         }
 
         private void UpdateCheckBoxHeader(object sender, RoutedEventArgs e)
@@ -280,7 +308,7 @@ namespace NotationTB.UserControl
                     header += checkBox.Content + ", ";
                 }
             }
-            test.Header = header;
+            OptionalRulesMenu.Header = header;
         }
 
         private void ProductStandardComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

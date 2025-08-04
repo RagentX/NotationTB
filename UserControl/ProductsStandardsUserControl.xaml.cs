@@ -44,7 +44,7 @@ namespace NotationTB.UserControl
         public ProductsStandardsUserControl(MaterialsType materialsType, int id)
         {
             InitializeComponent();
-            this.materialType = materialType;
+            this.materialType = materialsType;
             this.Id = id;
             AfterInitialize();
         }
@@ -127,7 +127,7 @@ namespace NotationTB.UserControl
         }
 
         
-
+        //TODO погонять по тестам, не всегда Тип материала выбран
         private void AddTabItem()
         {
             if (materialType != null && productType != null)

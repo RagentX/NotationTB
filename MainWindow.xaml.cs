@@ -37,6 +37,8 @@ namespace NotationTB
         private List<NotationPart> notationParts = new List<NotationPart>();
         private List<OperationsType> allOperations = new();
         private Dictionary<int, bool> SelectedOperationIds = new();
+        private List<OptionalRule> optionalRules = new();
+        private List<CheckBox> checkBoxes = new List<CheckBox>();
 
         /// <summary>
         /// Главное окно приложения
@@ -54,13 +56,9 @@ namespace NotationTB
                     ClassificationDesignationsComboBox.Items.Add(materialsStamp);
                 }
             }
-
+            OnUpdateClassificationDesignation += UpdateOtherRules;
             AddDetail();
-
-
         }
-
-        
 
         private void UpdateSizeNotationTable(object sender, SizeChangedEventArgs e)
         {
@@ -91,9 +89,11 @@ namespace NotationTB
                 OtherRuleHeaderLabel.ActualWidth);
             OnUpdateClassificationDesignation += notationPart.UpdateOtherRules;
             if (ClassificationDesignationsComboBox.SelectedIndex >= 0)
-                OnUpdateClassificationDesignation.Invoke((ClassificationDesignationsComboBox.SelectedItem as ClassificationDesignation).Id);
+                OnUpdateClassificationDesignation.Invoke(
+                    (ClassificationDesignationsComboBox.SelectedItem as ClassificationDesignation).Id);
             detailsStackPanel.Children.Add(notationPart);
         }
+
         private void ClassificationDesignationsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             OnUpdateClassificationDesignation.Invoke(
@@ -130,6 +130,7 @@ namespace NotationTB
             }
 
         }
+
         public void PreviewDataGridUpdate()
         {
             PreviewDataGrid.Columns.Clear();
@@ -174,8 +175,10 @@ namespace NotationTB
                     Binding = new Binding($"BindValues[{opId.Key}]")
                 });
             }
+
             PreviewDataGrid.ItemsSource = notationParts;
         }
+
         private void MainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             string tabItem = ((sender as TabControl).SelectedItem as TabItem).Name as string;
@@ -190,5 +193,41 @@ namespace NotationTB
                     return;
             }
         }
+
+        public void UpdateOtherRules(int classDesignationId)
+        {
+            using (var db = new AppDbContext())
+            {
+                optionalRules = db.OptionalRules.Where(o =>
+                    (o.DesignationId == classDesignationId || o.DesignationId == null) &&
+                    o.ForAll == true &&
+                    o.MaterialTypeId == null).ToList();
+                OptionalRulesMenu.Items.Clear();
+                foreach (var optionalRule in optionalRules)
+                {
+                    CheckBox checkBox = new CheckBox();
+                    checkBox.Content = optionalRule.ToString();
+                    checkBox.Checked += UpdateCheckBoxHeader;
+                    checkBox.Unchecked += UpdateCheckBoxHeader;
+                    checkBoxes.Add(checkBox);
+                    OptionalRulesMenu.Items.Add(checkBox);
+                }
+            }
+        }
+
+        private void UpdateCheckBoxHeader(object sender, RoutedEventArgs e)
+        {
+            string header = "Выбрано: ";
+            foreach (CheckBox checkBox in checkBoxes)
+            {
+                if (checkBox.IsChecked == true)
+                {
+                    header += checkBox.Content + ", ";
+                }
+            }
+
+            OptionalRulesMenu.Header = header;
+        }
+
     }
 }

@@ -39,32 +39,32 @@ namespace NotationTB
 
         private void Update()
         {
-            //db = new NotationTbContext();
-            //db.OperationsTypes.Load();
-            //operationsTypesGrid.ItemsSource = db.OperationsTypes.Local.ToBindingList();
+            db = new AppDbContext();
+            db.OperationsTypes.Load();
+            operationsTypesGrid.ItemsSource = db.OperationsTypes.Local.ToBindingList();
         }
         private void saveMenuItem_Click(object sender, RoutedEventArgs e)  
         {
             List<string> keyList = new List<string>();
             for (int i = 0; i < operationsTypesGrid.Items.Count; i++)
             {
-                //OperationsType operationsType = operationsTypesGrid.Items[i] as OperationsType;
-                //if (operationsType != null)
-                //{
-                //    keyList.Add(operationsType.Id);
-                //}
+                OperationsType operationsType = operationsTypesGrid.Items[i] as OperationsType;
+                if (operationsType != null)
+                {
+                    keyList.Add(operationsType.Id.ToString());
+                }
             }
             for (int i = 0; i < operationsTypesGrid.Items.Count; i++)
             {
                 OperationsType operationsType = operationsTypesGrid.Items[i] as OperationsType;
                 if (operationsType != null)
                 {
-                    //string key = operationsType.Id;
-                    //if (keyList.Where(l => l == key).Count() > 1 || key == null || key == "")
-                    //{
-                    //    MessageBox.Show("В таблице есть строчки с одинаковыми или пустыми ключами.");
-                    //    return;
-                    //}
+                    string key = operationsType.Id.ToString();
+                    if (keyList.Where(l => l == key).Count() > 1 || key == null || key == "")
+                    {
+                        MessageBox.Show("В таблице есть строчки с одинаковыми или пустыми ключами.");
+                        return;
+                    }
                 }
             }
             db.SaveChanges();

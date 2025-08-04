@@ -12,7 +12,7 @@
             <MenuItem x:Name="FileMenuItem" Header="Файл" Height="18"/>
             <MenuItem x:Name="DBMenuItem" Header="Работа с БД" Height="18">
                 <MenuItem x:Name="OperationsTypesMenuItem" Header="Типы операций" Click="OperationsTypesMenuItem_Click"/>
-                
+
             </MenuItem>
             <MenuItem x:Name="helpMenuItem" Header="Справка" Height="18"/>
             <MenuItem x:Name="Test" Header="test" Height="18" Click="Test_Click"/>
@@ -29,11 +29,14 @@
                                 <Button Content="Добавить крепёж" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Width="180" Margin="196,52,0,0" Background="{x:Null}"/>
                                 <Button Content="Удалить выбранные элеметы" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Width="180" Margin="383,52,0,0" Background="{x:Null}"/>
                                 <Label Content="Обозначение ТБ" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
-                                <Label Content="Тип трубопроводной арматуры" HorizontalAlignment="Left" Margin="10,22,0,0" VerticalAlignment="Top"/>
-                                <Label Content="Классификационное обозначение" HorizontalAlignment="Left" Margin="357,25,0,0" VerticalAlignment="Top"/>
-                                <ComboBox x:Name="ClassificationDesignationsComboBox" HorizontalAlignment="Left" Margin="561,25,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ClassificationDesignationsComboBox_SelectionChanged"/>
-                                <CheckBox Content="Рабочая температура(до 100/более 100)" HorizontalAlignment="Left" Margin="357,5,0,0" VerticalAlignment="Top"/>
+                                <Label Content="Классификационное обозначение" HorizontalAlignment="Left" Margin="10,23,0,0" VerticalAlignment="Top"/>
+                                <ComboBox x:Name="ClassificationDesignationsComboBox" HorizontalAlignment="Left" Margin="214,25,0,0" VerticalAlignment="Top" Width="138" SelectionChanged="ClassificationDesignationsComboBox_SelectionChanged"/>
                                 <TextBox HorizontalAlignment="Left" Margin="116,5,0,0" TextWrapping="Wrap" Text="test" VerticalAlignment="Top" Width="236"/>
+                                <Label Content="Доп. условия" HorizontalAlignment="Left" Margin="357,1,0,0" VerticalAlignment="Top"/>
+                                <Menu Margin="444,3,10,0" Height="20" VerticalAlignment="Top">
+                                    <MenuItem x:Name="OptionalRulesMenu" Header="Выбрано: " Margin="0,0,2,0">
+                                    </MenuItem>
+                                </Menu>
                             </Grid>
                             <Grid Margin="0,75,0,0">
                                 <Grid x:Name="HeaderGrid"  Background="#FFDAD7D7" Margin="0,0,0,0" VerticalAlignment="Top" Height="27">
