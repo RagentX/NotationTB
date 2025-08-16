@@ -30,9 +30,13 @@ namespace NotationTB.UserControl
         private List<MaterialsStandard> materialsStandards;
         private List<ProductsStandard> productsStandards;
         private List<MaterialsAndProductsCombination> materialsAndProductsCombinations;
+
         private List<OptionalRule> optionalRules;
+        private Dictionary<OptionalRule,CheckBox> optionalRulesToCheckBox = new Dictionary<OptionalRule, CheckBox>();
 
         private int classificationId;
+
+        public Dictionary<OptionalRule, CheckBox> mainOptionalRulesToCheckBox;
 
         public string DetailName
         {
@@ -115,11 +119,17 @@ namespace NotationTB.UserControl
             }
         }
 
+        public bool IsSelected
+        {
+            get
+            { 
+                return CheckBox.IsChecked == true;
+            }
+        }
         public Dictionary<int, bool> BindValues { get; set; } = new();
 
         
 
-        private List<CheckBox> checkBoxes = new List<CheckBox>();
         public NotationPart()
         {
             InitializeComponent();
@@ -144,11 +154,23 @@ namespace NotationTB.UserControl
                         b.MaterialTypeId == materialStamp.TypeId &&
                         b.DesignationId == classificationId).ToList();
                     foreach (var baseRule in baseRules) BindValues[baseRule.OperationTypeId] = baseRule.Value;
-
+                    
                     var exceptionRules = db.ExceptionRulesOperations.Where(e =>
                         e.CombinationId == combination.Id).ToList();
                     foreach (var exceptionRule in exceptionRules)
                         BindValues[exceptionRule.OperationTypeId] = exceptionRule.Value;
+                    //добавление дополнительных операци из строки материала
+                    foreach (var optionalRule in optionalRulesToCheckBox)
+                    {
+                        if (optionalRule.Value.IsChecked == true)
+                            BindValues[optionalRule.Key.OperationTypeId] = true;
+                    }
+                    foreach (var optionalRule in mainOptionalRulesToCheckBox)
+                    {
+                        if (optionalRule.Value.IsChecked == true)
+                            BindValues[optionalRule.Key.OperationTypeId] = true;
+                    }
+
                 }
         }
 
@@ -251,57 +273,82 @@ namespace NotationTB.UserControl
                 ProductStandardComboBox.SelectedIndex = -1;
             }
         }
-
-        public void UpdateOtherRules(int classDesignationId)
+        /// <summary>
+        /// Обновление дополнительных правил и кода классификации
+        /// </summary>
+        /// <param name="classDesignationId"></param>
+        public void UpdateDesignationId(int classDesignationId)
         {
             classificationId = classDesignationId;
             BindValuesUpdate();
-
-            using (var db = new AppDbContext())
-            {
-                optionalRules = db.OptionalRules.Where(o =>
-                    (o.DesignationId == classificationId || o.DesignationId == null) && 
-                    o.ForAll == false && 
-                    o.MaterialTypeId == null).ToList();
-                OptionalRulesMenu.Items.Clear();
-                foreach (var optionalRule in optionalRules)
-                {
-                    CheckBox checkBox = new CheckBox();
-                    checkBox.Content = optionalRule.ToString();
-                    checkBox.Checked += UpdateCheckBoxHeader;
-                    checkBox.Unchecked += UpdateCheckBoxHeader;
-                    checkBoxes.Add(checkBox);
-                    OptionalRulesMenu.Items.Add(checkBox);
-                }
-            }
-
+            UpdateOtherRules();
         }
+        /// <summary>
+        /// Обновление дополнительных правил
+        /// </summary>
         public void UpdateOtherRules()
         {
-            using (var db = new AppDbContext())
+            if (MaterialStampComboBox.SelectedIndex >= 0)
             {
-                optionalRules = db.OptionalRules.Where(o =>
-                    (o.DesignationId == classificationId || o.DesignationId == null) &&
-                    o.ForAll == false &&
-                    (o.MaterialTypeId == (MaterialStampComboBox.SelectedItem as MaterialsStamp).TypeId || o.MaterialTypeId == null)).ToList();
-                OptionalRulesMenu.Items.Clear();
-                foreach (var optionalRule in optionalRules)
+                using (var db = new AppDbContext())
                 {
-                    CheckBox checkBox = new CheckBox();
-                    checkBox.Content = optionalRule.ToString();
-                    checkBox.Checked += UpdateCheckBoxHeader;
-                    checkBox.Unchecked += UpdateCheckBoxHeader;
-                    checkBoxes.Add(checkBox);
-                    OptionalRulesMenu.Items.Add(checkBox);
+                    optionalRules = db.OptionalRules.Where(o =>
+                        (o.DesignationId == classificationId || o.DesignationId == null) &&
+                        o.ForAll == false &&
+                        (o.MaterialTypeId == (MaterialStampComboBox.SelectedItem as MaterialsStamp).TypeId ||
+                         o.MaterialTypeId == null)).ToList();
+                    OptionalRulesMenu.Items.Clear();
+                    foreach (var optionalRule in optionalRules)
+                    {
+                        if (optionalRulesToCheckBox.ContainsKey(optionalRule))
+                        {
+                            CheckBox checkBox = optionalRulesToCheckBox[optionalRule];
+                            checkBox.Content = optionalRule.ToString();
+                            checkBox.Checked += UpdateCheckBoxHeader;
+                            checkBox.Unchecked += UpdateCheckBoxHeader;
+                            OptionalRulesMenu.Items.Add(checkBox);
+                            optionalRulesToCheckBox[optionalRule] = checkBox;
+                        }
+                        else
+                        {
+                            CheckBox checkBox = new CheckBox();
+                            checkBox.Content = optionalRule.ToString();
+                            checkBox.Checked += UpdateCheckBoxHeader;
+                            checkBox.Unchecked += UpdateCheckBoxHeader;
+                            OptionalRulesMenu.Items.Add(checkBox);
+                            optionalRulesToCheckBox[optionalRule] = checkBox;
+                        }
+
+                        UpdateCheckBoxHeader();
+                    }
+
+                    List<OptionalRule> dellList = new();
+                    foreach (var optionalRuleToChecBox in optionalRulesToCheckBox)
+                    {
+                        if (!OptionalRulesMenu.Items.Contains(optionalRuleToChecBox.Value))
+                        {
+                            dellList.Add(optionalRuleToChecBox.Key);
+                        }
+                    }
+
+                    foreach (var optionalRule in dellList)
+                    {
+                        optionalRulesToCheckBox.Remove(optionalRule);
+                    }
                 }
             }
 
-        }
 
+        }
+        /// <summary>
+        /// Событие выбора дополнительного правила
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void UpdateCheckBoxHeader(object sender, RoutedEventArgs e)
         {
             string header = "Выбрано: ";
-            foreach (CheckBox checkBox in checkBoxes)
+            foreach (CheckBox checkBox in OptionalRulesMenu.Items)
             {
                 if (checkBox.IsChecked == true)
                 {
@@ -309,6 +356,21 @@ namespace NotationTB.UserControl
                 }
             }
             OptionalRulesMenu.Header = header;
+            BindValuesUpdate();
+        }
+
+        private void UpdateCheckBoxHeader()
+        {
+            string header = "Выбрано: ";
+            foreach (CheckBox checkBox in OptionalRulesMenu.Items)
+            {
+                if (checkBox.IsChecked == true)
+                {
+                    header += checkBox.Content + ", ";
+                }
+            }
+            OptionalRulesMenu.Header = header;
+            BindValuesUpdate();
         }
 
         private void ProductStandardComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

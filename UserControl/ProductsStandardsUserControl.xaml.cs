@@ -130,13 +130,12 @@ namespace NotationTB.UserControl
         //TODO погонять по тестам, не всегда Тип материала выбран
         private void AddTabItem()
         {
-            if (materialType != null && productType != null)
+            if (materialType != null)
             {
                 TabItem tabItem = new TabItem();
                 tabItem.Header = "n/a";
                 ProductStandardSettingUserControl.ProductStandardSettingUserControl product;
-                product = new ProductStandardSettingUserControl.ProductStandardSettingUserControl(materialType.Id,
-                    productType.Id, productStandardSettingUserControls.Count);
+                product = new ProductStandardSettingUserControl.ProductStandardSettingUserControl(materialType.Id, productStandardSettingUserControls.Count, productType.Id);
                 Save += product.Save;
                 product.StandardChange += UpdateSelectedProductsStandard;
                 product.ProductStandardComboBox.ItemsSource = ProductsStandards;

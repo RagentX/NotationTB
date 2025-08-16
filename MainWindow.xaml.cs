@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.EntityFrameworkCore;
+using NotationTB.BusinessLogic;
 using NotationTB.BusinessLogic.Object;
 using NotationTB.Data;
 using NotationTB.Models;
@@ -38,7 +39,8 @@ namespace NotationTB
         private List<OperationsType> allOperations = new();
         private Dictionary<int, bool> SelectedOperationIds = new();
         private List<OptionalRule> optionalRules = new();
-        private List<CheckBox> checkBoxes = new List<CheckBox>();
+
+        private Dictionary<OptionalRule, CheckBox> optionalRulesToCheckBox = new Dictionary<OptionalRule, CheckBox>();
 
         /// <summary>
         /// Главное окно приложения
@@ -80,6 +82,7 @@ namespace NotationTB
         {
             NotationPart notationPart = new NotationPart();
             notationParts.Add(notationPart);
+            notationPart.mainOptionalRulesToCheckBox = optionalRulesToCheckBox;
             OnUpdateSize += notationPart.UpdateSize;
             OnUpdateSize?.Invoke(NameHeaderLabel.ActualWidth,
                 PlanNameHeaderLabel.ActualWidth,
@@ -87,7 +90,7 @@ namespace NotationTB
                 MaterialStandartHeaderLabel.ActualWidth,
                 ProductStandartHeaderLabel.ActualWidth,
                 OtherRuleHeaderLabel.ActualWidth);
-            OnUpdateClassificationDesignation += notationPart.UpdateOtherRules;
+            OnUpdateClassificationDesignation += notationPart.UpdateDesignationId;
             if (ClassificationDesignationsComboBox.SelectedIndex >= 0)
                 OnUpdateClassificationDesignation.Invoke(
                     (ClassificationDesignationsComboBox.SelectedItem as ClassificationDesignation).Id);
@@ -203,31 +206,65 @@ namespace NotationTB
                     o.ForAll == true &&
                     o.MaterialTypeId == null).ToList();
                 OptionalRulesMenu.Items.Clear();
+                optionalRulesToCheckBox.Clear();
                 foreach (var optionalRule in optionalRules)
                 {
                     CheckBox checkBox = new CheckBox();
                     checkBox.Content = optionalRule.ToString();
                     checkBox.Checked += UpdateCheckBoxHeader;
                     checkBox.Unchecked += UpdateCheckBoxHeader;
-                    checkBoxes.Add(checkBox);
+                    optionalRulesToCheckBox[optionalRule] = checkBox;
                     OptionalRulesMenu.Items.Add(checkBox);
                 }
+
+                UpdateCheckBoxHeader();
             }
         }
 
         private void UpdateCheckBoxHeader(object sender, RoutedEventArgs e)
         {
+            UpdateCheckBoxHeader();
+        }
+        private void UpdateCheckBoxHeader()
+        {
             string header = "Выбрано: ";
-            foreach (CheckBox checkBox in checkBoxes)
+            foreach (var optionalRuleToCheckBox in optionalRulesToCheckBox)
             {
-                if (checkBox.IsChecked == true)
+                if (optionalRuleToCheckBox.Value.IsChecked == true)
                 {
-                    header += checkBox.Content + ", ";
+                    header += optionalRuleToCheckBox.Value.Content + ", ";
                 }
             }
 
             OptionalRulesMenu.Header = header;
+            PreviewDataGridUpdate();
         }
 
+        private void SaveWordButton_Click(object sender, RoutedEventArgs e)
+        {
+            CreateWordTB.CreateWord(notationParts);
+        }
+
+        private void DellButton_Click(object sender, RoutedEventArgs e)
+        {
+            detailsStackPanel.Children.Clear();
+            List<NotationPart> removeList = new List<NotationPart>();
+            foreach (var notationPart in notationParts)
+            {
+                if (notationPart.IsSelected)
+                {
+                    removeList.Add(notationPart);
+                }
+                else
+                {
+                    detailsStackPanel.Children.Add(notationPart);
+                }
+            }
+
+            foreach (var notationPart in removeList)
+            {
+                notationParts.Remove(notationPart);
+            }
+        }
     }
 }

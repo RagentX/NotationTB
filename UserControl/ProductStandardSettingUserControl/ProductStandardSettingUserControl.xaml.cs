@@ -37,16 +37,18 @@ namespace NotationTB.UserControl.ProductStandardSettingUserControl
 
         private NotationRule notationRule;
 
-        private ProductsStandard productsType;
+        private ProductsStandard productStandard;
 
         public event Action<ProductsStandard, ProductsStandard, int> StandardChange;
         
 
-        public ProductStandardSettingUserControl(int materialTypeId, int productTypeId, int id)
+        public ProductStandardSettingUserControl(int materialTypeId, int id, int productTypeId)
         {
             InitializeComponent();
+            this.productTypeID = productTypeId;
             this.notationRule = new NotationRule(materialTypeId, productTypeId);
             Id = id;
+
             AfterInitialize();
         }
         public ProductStandardSettingUserControl(int combinationId, int id)
@@ -163,8 +165,8 @@ namespace NotationTB.UserControl.ProductStandardSettingUserControl
         private void ProductStandardComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var newProductsStandard = ProductStandardComboBox.SelectedItem as ProductsStandard;
-            StandardChange.Invoke(productsType, newProductsStandard, Id);
-            productsType = newProductsStandard;
+            StandardChange.Invoke(productStandard, newProductsStandard, Id);
+            productStandard = newProductsStandard;
         }
     }
 
