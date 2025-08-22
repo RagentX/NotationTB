@@ -1,5 +1,6 @@
 ﻿//using NotationTB.SqlTables;
 
+using System.Collections.ObjectModel;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Windows;
@@ -35,7 +36,7 @@ namespace NotationTB
         public event Action<double, double, double, double, double, double> OnUpdateSize;
         public event Action<int> OnUpdateClassificationDesignation;
 
-        private List<NotationPart> notationParts = new List<NotationPart>();
+        private ObservableCollection<NotationPart> notationParts = new ObservableCollection<NotationPart>();
         private List<OperationsType> allOperations = new();
         private Dictionary<int, bool> SelectedOperationIds = new();
         private List<OptionalRule> optionalRules = new();
@@ -59,7 +60,6 @@ namespace NotationTB
                 }
             }
             OnUpdateClassificationDesignation += UpdateOtherRules;
-            AddDetail();
         }
 
         private void UpdateSizeNotationTable(object sender, SizeChangedEventArgs e)
@@ -109,6 +109,12 @@ namespace NotationTB
             operationsTypesWindow.Show();
         }
 
+        private void AddMatComb_Click(object sender, RoutedEventArgs e)
+        {
+            AddMatCombinations addMatCombinations = new();
+            addMatCombinations.Show();
+        }
+        
         private void Test_Click(object sender, RoutedEventArgs e)
         {
             MaterialWindow materialWindow = new MaterialWindow();
@@ -242,7 +248,7 @@ namespace NotationTB
 
         private void SaveWordButton_Click(object sender, RoutedEventArgs e)
         {
-            CreateWordTB.CreateWord(notationParts);
+            CreateWordTB.CreateWord(notationParts.ToList());
         }
 
         private void DellButton_Click(object sender, RoutedEventArgs e)

@@ -100,6 +100,8 @@ namespace NotationTB.BusinessLogic
                                 table.Cell(rowIndex, SelectedOperationIds[value.Key]).Range.Text = "+";
                             }
                         }
+
+                        rowIndex++;
                     }
 
                     table.Cell(1, 4).Range.Text = "Наименование операции / Operation name";

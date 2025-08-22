@@ -12,7 +12,7 @@
             <MenuItem x:Name="FileMenuItem" Header="Файл" Height="18"/>
             <MenuItem x:Name="DBMenuItem" Header="Работа с БД" Height="18">
                 <MenuItem x:Name="OperationsTypesMenuItem" Header="Типы операций" Click="OperationsTypesMenuItem_Click"/>
-
+                <MenuItem x:Name="AddMatComb" Header="Массовая загрузка комбинаций" Click="AddMatComb_Click"/>
             </MenuItem>
             <MenuItem x:Name="helpMenuItem" Header="Справка" Height="18"/>
             <MenuItem x:Name="Test" Header="test" Height="18" Click="Test_Click"/>
