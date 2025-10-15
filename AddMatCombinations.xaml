@@ -12,7 +12,7 @@
             <Button Click="Validate_Click" Content="Проверить" Margin="4"/>
             <Button Click="Save_Click" Content="Сохранить в БД" Margin="4"/>
             <Separator/>
-            <TextBlock Text="{Binding Status}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding Status}" Margin="8,0,0,0" VerticalAlignment="Center" Name="statusTextBox"/>
         </ToolBar>
 
         <DataGrid ItemsSource="{Binding Rows}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="6"

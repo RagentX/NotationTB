@@ -23,6 +23,11 @@ namespace NotationTB.BusinessLogic
         Task<LookupIds?> ResolveIdsAsync(ImportRow row, CancellationToken ct);
         Task<bool> IsDuplicateCombinationAsync(int materialsStampId, int productsStandardId, int materialsStandardId, CancellationToken ct);
         Task InsertCombinationAsync(int materialsStampId, int productsStandardId, int materialsStandardId, IDbTransaction? tx, CancellationToken ct);
+        Task InsertMaterialStamp(string materialStampsName, int materialTypeId, IDbTransaction? tx, CancellationToken ct);
+        Task InsertMaterialStandard(string materialStandardName, IDbTransaction? tx, CancellationToken ct);
+
+        Task InsertProductStandard(string productStandardName, int productTypeId, IDbTransaction? tx,
+            CancellationToken ct);
     }
 
     public class PgRepository : IPgRepository
@@ -36,44 +41,46 @@ namespace NotationTB.BusinessLogic
             // 1) Структурный класс (MaterialsType) по имени
             var materialsType = await _db.MaterialsTypes
                 .AsNoTracking()
-                .SingleOrDefaultAsync(t => t.Name.ToLower().Replace(" ", "") == row.StructuralClass.ToLower().Replace(" ", ""), ct);
-            if (materialsType is null) return null; // нет такого структурного класса
+                .FirstOrDefaultAsync(t => t.Name.ToLower().Replace(" ", "") == row.StructuralClass.ToLower().Replace(" ", ""), ct);
+            if (materialsType is null)
+                throw new InvalidOperationException("Структурный класс отсутствует в программе");
+                                                                                                             // // нет такого структурного класса
             int materialsTypeId = materialsType.Id; // :contentReference[oaicite:5]{index=5}
 
             // 2) Марка стали (MaterialsStamp) по имени + проверка 1:1 по TypeId
             var stamp = await _db.MaterialsStamps
                 .AsNoTracking()
-                .SingleOrDefaultAsync(s => s.Name == row.SteelGrade, ct);
-            if (stamp is null) return null; // марки нет
-            if (stamp.TypeId != materialsTypeId)
-                throw new InvalidOperationException("Марка стали привязана к другому структурному классу."); // :contentReference[oaicite:6]{index=6}
+                .FirstOrDefaultAsync(s => s.Name == row.SteelGrade, ct);
+            if (stamp != null && materialsType != null)
+                if (stamp.TypeId != materialsType.Id)
+                    throw new InvalidOperationException("Марка стали привязана к другому структурному классу."); // :contentReference[oaicite:6]{index=6}
 
             // 3) Стандарт/ТУ на материал (MaterialsStandard) по имени
             var matStd = await _db.MaterialsStandards
-                .AsNoTracking()
-                .SingleOrDefaultAsync(s => s.Name == row.MaterialStandard, ct);
-            if (matStd is null) return null; // нет стандарта/ТУ материала :contentReference[oaicite:7]{index=7}
+            .AsNoTracking()
+            .FirstOrDefaultAsync(s => s.Name == row.MaterialStandard, ct);
 
             // 4) Тип полуфабриката (ProductsType) по имени
             var prodType = await _db.ProductsTypes
                 .AsNoTracking()
-                .SingleOrDefaultAsync(t => t.Name.ToLower().Replace(" ", "") == row.ProductType.ToLower().Replace(" ", ""), ct);
-            if (prodType is null) return null;
+                .FirstOrDefaultAsync(t => t.Name.ToLower().Replace(" ", "") == row.ProductType.ToLower().Replace(" ", ""), ct);
+            if (prodType is null)
+                throw new InvalidOperationException("Такого типа полу фабриката нет в программе"); // :contentReference[oaicite:6]{index=6}
 
             // 5) Стандарт полуфабриката (ProductsStandard) — по (Name, TypeId)!
             var prodStd = await _db.ProductsStandards
                 .AsNoTracking()
-                .SingleOrDefaultAsync(s => s.Name == row.ProductStandard && s.TypeId == prodType.Id, ct);
-            if (prodStd is null) return null; // поддерживает кейс одно имя на разных типах :contentReference[oaicite:8]{index=8}
+                .FirstOrDefaultAsync(s => s.Name == row.ProductStandard && s.TypeId == prodType.Id, ct);
 
             return new LookupIds(
                 materialsTypeId,
-                stamp.Id,
-                matStd.Id,
+                stamp != null ? stamp.Id : -1 ,
+                matStd != null ? matStd.Id : -1,
                 prodType.Id,
-                prodStd.Id
+                prodStd != null ? prodStd.Id : -1
             );
         }
+
 
         public async Task<bool> IsDuplicateCombinationAsync(int materialsStampId, int productsStandardId, int materialsStandardId, CancellationToken ct)
         {
@@ -108,6 +115,75 @@ namespace NotationTB.BusinessLogic
 
 
             _db.MaterialsAndProductsCombinations.Add(entity);
+            await _db.SaveChangesAsync(ct);
+        }
+        public async Task InsertMaterialStamp(string materialStampsName, int materialTypeId, IDbTransaction? tx, CancellationToken ct)
+        {
+            // Если нам передали внешнюю транзакцию — «прикрепимся» к ней (если совместима)
+            if (tx is DbTransaction dbTx)
+            {
+                // Если контекст ещё не использует транзакцию — подцепим
+                var current = _db.Database.CurrentTransaction;
+                if (current == null || current.GetDbTransaction() != dbTx)
+                {
+                    await _db.Database.UseTransactionAsync(dbTx, ct);
+                }
+            }
+
+            var entity = new MaterialsStamp()
+            {
+                Name = materialStampsName,
+                TypeId = materialTypeId
+            };
+
+
+            _db.MaterialsStamps.Add(entity);
+            await _db.SaveChangesAsync(ct);
+        }
+        public async Task InsertMaterialStandard(string materialStandardName, IDbTransaction? tx, CancellationToken ct)
+        {
+            // Если нам передали внешнюю транзакцию — «прикрепимся» к ней (если совместима)
+            if (tx is DbTransaction dbTx)
+            {
+                // Если контекст ещё не использует транзакцию — подцепим
+                var current = _db.Database.CurrentTransaction;
+                if (current == null || current.GetDbTransaction() != dbTx)
+                {
+                    await _db.Database.UseTransactionAsync(dbTx, ct);
+                }
+            }
+
+            var entity = new MaterialsStandard()
+            {
+                Name = materialStandardName,
+            };
+
+
+            _db.MaterialsStandards.Add(entity);
+            await _db.SaveChangesAsync(ct);
+        }
+
+        public async Task InsertProductStandard(string productStandardName, int productTypeId, IDbTransaction? tx, CancellationToken ct)
+        {
+            // Если нам передали внешнюю транзакцию — «прикрепимся» к ней (если совместима)
+            if (tx is DbTransaction dbTx)
+            {
+                // Если контекст ещё не использует транзакцию — подцепим
+                var current = _db.Database.CurrentTransaction;
+                if (current == null || current.GetDbTransaction() != dbTx)
+                {
+                    await _db.Database.UseTransactionAsync(dbTx, ct);
+                }
+            }
+
+            var entity = new ProductsStandard()
+            {
+                Name = productStandardName,
+                TypeId = productTypeId
+            };
+
+
+            _db.ProductsStandards.Add(entity);
             await _db.SaveChangesAsync(ct);
         }
     }

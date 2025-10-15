@@ -4,16 +4,31 @@ using System.Windows;
 using NotationTB.BusinessLogic;
 using NotationTB.BusinessLogic.Object;
 using NotationTB.Data;
+using System.ComponentModel;
 
 namespace NotationTB
 {
     /// <summary>
     /// Логика взаимодействия для AddMatCombinations.xaml
     /// </summary>
-    public partial class AddMatCombinations : Window
+    public partial class AddMatCombinations : Window, INotifyPropertyChanged
     {
         public ObservableCollection<ImportRow> Rows { get; } = new();
-        public string Status { get; set; } = "Готово";
+        private string _status = "Готово";
+        public string Status
+        {
+            get => _status;
+            set
+            {
+                if (_status == value) return;
+                _status = value;
+                OnPropertyChanged(nameof(Status));
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private void OnPropertyChanged(string name)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
         private readonly IRowValidator _validator;
         private readonly IPgRepository _repo;
@@ -41,14 +56,12 @@ namespace NotationTB
                 Rows.Add(r);
 
             Status = $"Загружено строк: {Rows.Count}";
-            OnPropertyChanged(nameof(Status));
         }
 
         private async void Validate_Click(object sender, RoutedEventArgs e)
         {
             if (Rows.Count == 0) return;
             Status = "Проверка…";
-            OnPropertyChanged(nameof(Status));
 
             await _uploader.ValidateAsync(Rows, CancellationToken.None);
 
@@ -63,22 +76,17 @@ namespace NotationTB
                     r.Error = "OK";
             }
             Status = "Проверка завершена";
-            OnPropertyChanged(nameof(Status));
+
         }
 
         private async void Save_Click(object sender, RoutedEventArgs e)
         {
             if (Rows.Count == 0) return;
             Status = "Сохранение…";
-            OnPropertyChanged(nameof(Status));
 
             var count = await _uploader.SaveAsync(Rows, CancellationToken.None);
             Status = $"Сохранено строк: {count}. Дубликатов: {Rows.Count(r => r.IsDuplicate)}";
-            OnPropertyChanged(nameof(Status));
         }
 
-        // INotifyPropertyChanged (либо замените на MVVM Toolkit)
-        public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
-        private void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(name));
     }
 }

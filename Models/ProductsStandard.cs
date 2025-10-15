@@ -18,7 +18,7 @@ public partial class ProductsStandard
     public override string ToString() => $"{Name}:{Type.Name}";
 
     public virtual ICollection<MaterialsAndProductsCombination> MaterialsAndProductsCombinations { get; set; } = new List<MaterialsAndProductsCombination>();
-
+    private ProductsType _type;
     public virtual ProductsType Type 
     {
         get
@@ -27,10 +27,6 @@ public partial class ProductsStandard
             {
                 return db.ProductsTypes.Where(p => p.Id == TypeId).FirstOrDefault();
             }
-        }
-        set
-        {
-            Type = value;
         }
     }
 }

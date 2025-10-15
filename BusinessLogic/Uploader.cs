@@ -1,5 +1,6 @@
 ﻿// Uploader.cs (EF Core)
 using System.Linq;
+using System.Windows.Automation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using NotationTB.BusinessLogic.Object;
@@ -38,26 +39,26 @@ namespace NotationTB.BusinessLogic
                 if (!r.IsValid)
                     continue;
 
-                try
+            try
+            {
+                var ids = await _repo.ResolveIdsAsync(r, ct);
+                if (ids is null)
                 {
-                    var ids = await _repo.ResolveIdsAsync(r, ct);
-                    if (ids is null)
-                    {
-                        r.IsValid = false;
-                        r.Error = "Не найдены справочные значения (марка/класс/стандарты/тип) в БД.";
-                        continue;
-                    }
-
-                    r.IsDuplicate = await _repo.IsDuplicateCombinationAsync(
-                        ids.MaterialsStampId, ids.ProductsStandardId, ids.MaterialsStandardId, ct);
+                    r.IsValid = false;
+                    r.Error = "Не найдены справочные значения (марка/класс/стандарты/тип) в БД.";
+                    continue;
                 }
+
+                r.IsDuplicate = await _repo.IsDuplicateCombinationAsync(
+                    ids.MaterialsStampId, ids.ProductsStandardId, ids.MaterialsStandardId, ct);
+            }
                 catch (InvalidOperationException ex)
                 {
-                    // Жёсткие проверки: 1:1 Марка ↔ Структурный класс и т.п.
-                    r.IsValid = false;
-                    r.Error = ex.Message;
-                }
+                // Жёсткие проверки: 1:1 Марка ↔ Структурный класс и т.п.
+                r.IsValid = false;
+                r.Error = r.Error + ex.Message + "[catch Uploader.cs]";
             }
+        }
         }
 
         /// <summary>
@@ -80,8 +81,34 @@ namespace NotationTB.BusinessLogic
                 {
                     foreach (var r in batch)
                     {
+                        
+
                         // На момент записи справочники могли измениться — переопределим Ids
                         var ids = await _repo.ResolveIdsAsync(r, ct);
+
+                        if (ids.MaterialsStampId == -1)
+                        {
+                            await _repo.InsertMaterialStamp(
+                                r.SteelGrade,
+                                ids.MaterialsTypeId,
+                                tx.GetDbTransaction(), ct);
+                        }
+                        if (ids.MaterialsStandardId == -1)
+                        {
+                            await _repo.InsertMaterialStandard(
+                                r.MaterialStandard,
+                                tx.GetDbTransaction(), ct);
+                        }
+                        if (ids.ProductsStandardId == -1)
+                        {
+                            await _repo.InsertProductStandard(
+                                r.ProductStandard,
+                                ids.ProductsTypeId,
+                                tx.GetDbTransaction(), ct);
+                        }
+
+                        ids = await _repo.ResolveIdsAsync(r, ct);
+
                         if (ids is null)
                         {
                             r.IsValid = false;
