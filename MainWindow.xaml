@@ -31,7 +31,7 @@
                                 <Label Content="Обозначение ТБ" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
                                 <Label Content="Классификационное обозначение" HorizontalAlignment="Left" Margin="10,23,0,0" VerticalAlignment="Top"/>
                                 <ComboBox x:Name="ClassificationDesignationsComboBox" HorizontalAlignment="Left" Margin="214,25,0,0" VerticalAlignment="Top" Width="138" SelectionChanged="ClassificationDesignationsComboBox_SelectionChanged"/>
-                                <TextBox HorizontalAlignment="Left" Margin="116,5,0,0" TextWrapping="Wrap" Text="test" VerticalAlignment="Top" Width="236"/>
+                                <TextBox x:Name="TbNameTextBox" HorizontalAlignment="Left" Margin="116,5,0,0" TextWrapping="Wrap" Text="test" VerticalAlignment="Top" Width="236"/>
                                 <Label Content="Доп. условия" HorizontalAlignment="Left" Margin="357,1,0,0" VerticalAlignment="Top"/>
                                 <Menu Margin="444,3,10,0" Height="20" VerticalAlignment="Top">
                                     <MenuItem x:Name="OptionalRulesMenu" Header="Выбрано: " Margin="0,0,2,0">

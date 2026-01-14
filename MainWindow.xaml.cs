@@ -51,6 +51,7 @@ namespace NotationTB
         {
             InitializeComponent();
             this.userID = userID;
+            TbNameTextBox.Text = "test_" + DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second;
             using (var db = new AppDbContext())
             {
                 classDesignations = db.ClassificationDesignations;
@@ -248,7 +249,7 @@ namespace NotationTB
 
         private void SaveWordButton_Click(object sender, RoutedEventArgs e)
         {
-            CreateWordTB.CreateWord(notationParts.ToList());
+            CreateWordTB.CreateWord(notationParts.ToList(), TbNameTextBox.Text);
         }
 
         private void DellButton_Click(object sender, RoutedEventArgs e)

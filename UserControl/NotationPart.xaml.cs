@@ -118,7 +118,6 @@ namespace NotationTB.UserControl
                 return "";
             }
         }
-
         public bool IsSelected
         {
             get
